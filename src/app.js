@@ -13,6 +13,9 @@ class App {
 
         var middlewareHttp = function (request, response, next) {
             response.setHeader('Api-version', packageJson.version);
+            // response.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
+            // response.setHeader('Access-Control-Allow-Headers', 'Content-Type, my-custom-header');
+            request.accepts('application/json');
 
             console.log(`${request.method} ${request.originalUrl}`);
             if (request.body && Object.keys(request.body).length >0) {
@@ -20,6 +23,7 @@ class App {
             }
             next();
         };
+
         app.use(middlewareHttp);
 
         place.configure(app);
@@ -27,6 +31,12 @@ class App {
         app.get('/api/version', function (request, response) {
             response.json({
                 version: packageJson.version
+            });
+        });
+
+        app.get('*', function(request, response){
+            response.json({
+                key: "not found"
             });
         });
 

@@ -27,9 +27,18 @@ describe("Places/controller", () => {
       });
   });
 
-  //TODO Ajouter ici le test qui vérifie le nombre de place remonté par l'api
+  it("GET /api/places should answer the same number of object than in BDD", () => {
+    const app = new App(new Place(new PlaceData())).app;
+    return request(app)
+      .get("/api/places")
+      .expect("Content-Type", /json/)
+      .expect(200)
+      .expect(response => {
+        assert.equal(response.body.length, 3);
+      });
+  });
 
-  /*it('POST /api/places should respond a http 201 OK with no image', () => {
+  it('POST /api/places should respond a http 201 OK with no image', () => {
         var newPlace = {
             name: 'Londre',
             author: 'Patrick',
@@ -97,5 +106,66 @@ describe("Places/controller", () => {
             .expect('Content-Type', /json/)
             .expect(400);
 
-    });*/
+    });
+
+    // tests suppression
+
+    it('DELETE /api/places/5 should respond a http 400 id not found', () => {
+      const app = new App(new Place(new PlaceData())).app;
+      return request(app)
+        .delete("/api/places/5")
+        .expect(400)
+    });
+    
+    it('DELETE /api/places/2 should respond a http 204', () => {
+      const app = new App(new Place(new PlaceData())).app;
+      return request(app)
+        .delete("/api/places/2")
+        .expect(204)
+    });
+
+    // Test remplacement
+    it("PUT /api/places/5 should respond a http 400 ko", () => {
+      const app = new App(new Place(new PlaceData())).app;
+      return request(app)
+        .put("/api/places/5")
+        .expect(400)
+    })
+
+    // Ici on pourrait faire le test avec tous les cas echéants mais on en choisit qu'un seul
+    it("PUT /api/places/2 should respond a http 400 ko", () => {
+      const app = new App(new Place(new PlaceData())).app;
+      var newPlace = {
+        name: 'Londre &',
+        author: 'Patrickmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm',
+        review: 2,
+        image: {
+            url: 'https://www.bworld.fr/api/file/get/c27e39ee-7ba9-46f8-aa7c-9e334c72a96c/d9d0634b-b1a0-42bd-843d-d3bc3cf7d842/ImageThumb/bworld-2016-v3.png',
+            title: ''
+        }
+    };
+
+      return request(app)
+        .put("/api/places/2")
+        .send(newPlace)
+        .expect(400)
+    })
+
+    it("PUT /api/places/2 should respond a http 200", () => {
+      var newPlace = {
+        name: 'Londre',
+        author: 'Patrick',
+        review: 2,
+        image: {
+            url: 'https://www.bworld.fr/api/file/get/c27e39ee-7ba9-46f8-aa7c-9e334c72a96c/d9d0634b-b1a0-42bd-843d-d3bc3cf7d842/ImageThumb/bworld-2016-v3.png',
+            title: 'bworld place'
+        }
+    };
+    const app = new App(new Place(new PlaceData())).app;
+    return request(app)
+        .put('/api/places/2')
+        .send(newPlace)
+        .expect('Location', /places/)
+        .expect(201);
+    })
 });
